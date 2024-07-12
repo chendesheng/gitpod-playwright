@@ -1,5 +1,9 @@
 image:
   file: .gitpod.Dockerfile
+tasks:
+    - command: |
+        pip install pytest-playwright
+        playwright install
 ports:
   - port: 5900
     onOpen: ignore
