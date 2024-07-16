@@ -3,11 +3,13 @@ image:
 tasks:
     - command: |
         pip install pytest-playwright
+        playwright install-deps
         playwright install
 
 vscode:
   extensions:
     - "ms-python.python"
+    - "littlefoxteam.vscode-python-test-adapter"
 
 ports:
   - port: 5900
