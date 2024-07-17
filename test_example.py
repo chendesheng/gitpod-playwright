@@ -46,7 +46,7 @@ def agent_console_page(page: Page):
 
     page.goto(f"{DOMAIN}/agentconsole/agentconsole.html?siteId={SITE_ID}")
     # page.wait_for_url(re.compile("(.*\/agentconsole\/agentconsole\.html\?)|(.*\/login\?retUrl=)"))
-    res = page.wait_for_function("""() => {
+    loaded_script = """() => {
         if (window.location.pathname.includes("/login")) {
             return 'login_page';
         } else if (document.querySelector("#dialog-title")?.textContent.trim() === "Force Login") {
@@ -55,7 +55,8 @@ def agent_console_page(page: Page):
             return 'agent_console';
         }
         return false;
-    }""").json_value()
+    }"""
+    res = page.wait_for_function(loaded_script).json_value()
     if res == "login_page":
         page.fill('input[name="email"]', EMAIL)
         page.fill('input[name="password"]', PASSWORD)
@@ -63,14 +64,7 @@ def agent_console_page(page: Page):
         page.wait_for_url("**/agentconsole/agentconsole.html?**")
         token = get_token_from_cookie(page.context)
         write_token_to_file(token)
-        res = page.wait_for_function("""() => {
-            if (document.querySelector("#dialog-title")?.textContent.trim() === "Force Login") {
-                return 'force_login_dialog';
-            } else if (document.querySelector("#app .MuiAvatar-root")){
-                return 'agent_console';
-            }
-            return false;
-        }""").json_value()
+        res = page.wait_for_function(loaded_script).json_value()
         if res == "force_login_dialog":
             page.click('button:has-text("OK")')
     elif res == "force_login_dialog":
