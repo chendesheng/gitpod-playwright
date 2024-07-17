@@ -1,6 +1,6 @@
 import pytest
 import re
-from playwright.sync_api import Page, BrowserContext, expect, TimeoutError
+from playwright.sync_api import Page, Frame, BrowserContext, expect, TimeoutError
 from playwright.sync_api import sync_playwright
 
 DOMAIN = "https://livechat6dash.testing.comm100dev.io"
@@ -94,13 +94,21 @@ def agent_console_page(page: Page):
 def preview_visitor_page(context: BrowserContext):
     page = context.new_page()
     page.goto(f"{DOMAIN}/frontEnd/livechatpage/assets/livechat/previewpage/?siteId={SITE_ID}&campaignId={CAMPAIGN_ID}")
-    page.wait_for_selector('#comm100-iframe')
+    page.wait_for_selector('#comm100-iframe', state='attached')
     return page
 
 # @pytest.mark.browser_context_args(bypass_csp=True)
-def test_has_title(agent_console_page: Page):
-    expect(agent_console_page).to_have_title(re.compile("Agent r t"), timeout=10000)
+# def test_has_title(agent_console_page: Page):
+#     expect(agent_console_page).to_have_title(re.compile("Agent r t"), timeout=10000)
 
-def test_has_title_2(agent_console_page: Page, preview_visitor_page: Page):
-    preview_visitor_page.wait_for_timeout(1000*1000)
-    expect(agent_console_page).to_have_title(re.compile("Agent r t"), timeout=10000)
+def test_send_chat_message(agent_console_page: Page, preview_visitor_page: Page):
+    chat_button_frame = preview_visitor_page.frame_locator(f'#comm100-button-{CAMPAIGN_ID} iframe')
+    chat_button_frame.locator('[role=button]').click()
+    preview_visitor_page.wait_for_selector('iframe#chat_window_container')
+    chat_window_frame = preview_visitor_page.frame_locator('iframe#chat_window_container')
+    chat_input = chat_window_frame.locator('.window__chatInputControl')
+    chat_input.fill("How are you?")
+    chat_input.press("Enter")
+    agent_console_page.click('[role=menuitem][aria-label="Live Chat"]')
+    message = agent_console_page.locator('//div[contains(@class, "ChatMessageBubble-module__container") and contains(normalize-space(.), "How are you?")]')
+    expect(message).to_be_visible(timeout=10000)
