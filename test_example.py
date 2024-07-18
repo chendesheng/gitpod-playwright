@@ -30,8 +30,8 @@ def write_token_to_file(token: str):
         file.write(token.encode())
 
 @pytest.fixture()
-def agent_console_page(page: Page):
-
+def agent_console_page(context: BrowserContext):
+    page = context.new_page()
     token = read_token_from_file()
     script = """((token, siteId, email) => {
         if (window.location.href.includes("/agentconsole/agentconsole.html")) {
@@ -95,7 +95,7 @@ def preview_visitor_page(context: BrowserContext):
 # def test_has_title(agent_console_page: Page):
 #     expect(agent_console_page).to_have_title(re.compile("Agent r t"), timeout=10000)
 
-def test_send_chat_message(agent_console_page: Page, preview_visitor_page: Page):
+def test_send_chat_message(preview_visitor_page: Page, agent_console_page: Page):
     chat_button_frame = preview_visitor_page.frame_locator(f'#comm100-button-{CAMPAIGN_ID} iframe')
     chat_button_frame.locator('[role=button]').click()
     preview_visitor_page.wait_for_selector('iframe#chat_window_container')
