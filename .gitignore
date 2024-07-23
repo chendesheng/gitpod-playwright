@@ -3,3 +3,4 @@ __pycache__
 test-results
 .auth
 pytestdebug.log
+snapshot_tests_failures/

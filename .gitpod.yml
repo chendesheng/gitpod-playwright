@@ -5,12 +5,6 @@ vscode:
   extensions:
     - "ms-python.python"
     - "littlefoxteam.vscode-python-test-adapter"
-tasks:
-  - name: Visual Regression Tracker
-    init: |
-      curl https://raw.githubusercontent.com/Visual-Regression-Tracker/Visual-Regression-Tracker/master/vrt-install.sh -o vrt-install.sh
-      chmod a+x vrt-install.sh
-    command: ./vrt-install.sh
 ports:
   - port: 5900
     onOpen: ignore
