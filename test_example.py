@@ -12,3 +12,9 @@ def test_send_chat_message(preview_visitor_page: Page, agent_console_page: Page,
     agent_console_page.click('[role=menuitem][aria-label="Live Chat"]')
     message = agent_console_page.locator('//div[contains(@class, "ChatMessageBubble-module__container") and contains(normalize-space(.), "How are you?")]')
     expect(message).to_be_visible(timeout=10000)
+
+
+def test_login_ui(control_panel_page: Page, assert_snapshot):
+  control_panel_page.wait_for_timeout(2*1000)
+  assert_snapshot(control_panel_page.screenshot())
+
