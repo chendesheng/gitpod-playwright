@@ -64,7 +64,7 @@ def agent_console_page(context: BrowserContext, site_id: int):
         }
     })""" + f"('{token}', {site_id}, '{EMAIL}')"
     # print(script)
-    page.context.add_init_script(script)
+    page.add_init_script(script)
 
     page.goto(f"{DOMAIN}/agentconsole/agentconsole.html?siteId={site_id}")
     # page.wait_for_url(re.compile("(.*\/agentconsole\/agentconsole\.html\?)|(.*\/login\?retUrl=)"))
