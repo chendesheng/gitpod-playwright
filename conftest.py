@@ -25,12 +25,12 @@ def browser_context_args(request):
 @pytest.fixture()
 def control_panel_page(context: BrowserContext):
     page = context.new_page()
-    page.goto('https://livechat6dash.testing.comm100dev.io/login')
+    page.goto(f'{DOMAIN}/login')
     return page
 
-def get_token_from_cookie(context: BrowserContext):
+def get_token_from_cookie(context: BrowserContext, site_id: int):
     for cookie in context.cookies():
-        if cookie['name'] == f"token_{SITE_ID}":
+        if cookie['name'] == f"token_{site_id}":
             return cookie['value']
     return None
 
@@ -52,7 +52,7 @@ def write_token_to_file(token: str):
         file.write(token.encode())
 
 @pytest.fixture()
-def agent_console_page(context: BrowserContext):
+def agent_console_page(context: BrowserContext, site_id: int):
     page = context.new_page()
     token = read_token_from_file()
     script = """((token, siteId, email) => {
@@ -62,11 +62,11 @@ def agent_console_page(context: BrowserContext):
             window.localStorage.setItem(`${email}_rememberStatus`, 'true');
             window.localStorage.setItem(`${email}_liveChatStatus`, 'online');
         }
-    })""" + f"('{token}', {SITE_ID}, '{EMAIL}')"
+    })""" + f"('{token}', {site_id}, '{EMAIL}')"
     # print(script)
     page.context.add_init_script(script)
 
-    page.goto(f"{DOMAIN}/agentconsole/agentconsole.html?siteId={SITE_ID}")
+    page.goto(f"{DOMAIN}/agentconsole/agentconsole.html?siteId={site_id}")
     # page.wait_for_url(re.compile("(.*\/agentconsole\/agentconsole\.html\?)|(.*\/login\?retUrl=)"))
     loaded_script = """() => {
         if (window.location.pathname.includes("/login")) {
@@ -84,7 +84,7 @@ def agent_console_page(context: BrowserContext):
         page.fill('input[name="password"]', PASSWORD)
         page.click('button:has-text("Sign in")')
         page.wait_for_url("**/agentconsole/agentconsole.html?**")
-        token = get_token_from_cookie(page.context)
+        token = get_token_from_cookie(page.context, site_id)
         write_token_to_file(token)
         res = page.wait_for_function(loaded_script).json_value()
         if res == "force_login_dialog":

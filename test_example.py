@@ -15,6 +15,6 @@ def test_send_chat_message(preview_visitor_page: Page, agent_console_page: Page,
 
 
 def test_login_ui(control_panel_page: Page, assert_snapshot):
-  control_panel_page.wait_for_timeout(2*1000)
+  control_panel_page.wait_for_load_state('networkidle')
   assert_snapshot(control_panel_page.screenshot())
 
