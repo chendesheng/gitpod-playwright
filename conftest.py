@@ -1,4 +1,5 @@
 import pytest
+import os
 from playwright.sync_api import BrowserContext
 
 DOMAIN = "https://livechat6dash.testing.comm100dev.io"
@@ -44,6 +45,9 @@ def read_token_from_file():
         return ''
 
 def write_token_to_file(token: str):
+    # create .auth if not exists
+    if not os.path.exists(".auth"):
+        os.makedirs(".auth")
     with open(".auth/token", 'wb') as file:
         file.write(token.encode())
 
